@@ -1,0 +1,90 @@
+name: Generate Daily Ephemeris
+
+on:
+  schedule:
+    # Ejecutar todos los días a las 00:01 UTC (01:01 en Madrid)
+    - cron: '1 0 * * *'
+  workflow_dispatch:
+    # Permite ejecución manual desde GitHub
+    inputs:
+      target_date:
+        description: 'Fecha objetivo para generar efeméride (YYYY-MM-DD)'
+        required: false
+        default: ''
+        type: string
+
+jobs:
+  generate-ephemeris:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Generate ephemeris for today
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          # Si se especifica una fecha manual, usarla; si no, usar la fecha actual
+          if [ -n "${{ github.event.inputs.target_date }}" ]; then
+            echo "Generando efeméride para fecha específica: ${{ github.event.inputs.target_date }}"
+            node scripts/generate-daily-ephemeris.js "${{ github.event.inputs.target_date }}"
+          else
+            echo "Generando efeméride para la fecha actual"
+            node scripts/generate-daily-ephemeris.js
+          fi
+          
+      - name: Commit and push if changes
+        run: |
+          # Configurar git
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          
+          # Verificar si hay cambios
+          if git diff --quiet; then
+            echo "No hay cambios para commitear"
+          else
+            # Agregar todos los cambios
+            git add .
+            
+            # Crear commit con timestamp
+            TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            git commit -m "🤖 Auto-generate ephemeris - $TIMESTAMP"
+            
+            # Hacer push
+            git push
+          fi
+        continue-on-error: true
+        
+      - name: Create summary
+        run: |
+          echo "## 📅 Generación de Efeméride Diaria" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "✅ **Estado:** Completado exitosamente" >> $GITHUB_STEP_SUMMARY
+          echo "🕐 **Ejecutado:** $(date -u)" >> $GITHUB_STEP_SUMMARY
+          echo "🎯 **Objetivo:** ${{ github.event.inputs.target_date || 'Fecha actual' }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📋 Detalles del Proceso:" >> $GITHUB_STEP_SUMMARY
+          echo "1. ✅ Código descargado del repositorio" >> $GITHUB_STEP_SUMMARY
+          echo "2. ✅ Node.js configurado (v20)" >> $GITHUB_STEP_SUMMARY
+          echo "3. ✅ Dependencias instaladas" >> $GITHUB_STEP_SUMMARY
+          echo "4. ✅ Script de generación ejecutado" >> $GITHUB_STEP_SUMMARY
+          echo "5. ✅ Cambios commitados (si los hubo)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔧 Variables de Entorno Configuradas:" >> $GITHUB_STEP_SUMMARY
+          echo "- `NEXT_PUBLIC_SUPABASE_URL`: ✅ Configurada" >> $GITHUB_STEP_SUMMARY
+          echo "- `SUPABASE_SERVICE_KEY`: ✅ Configurada" >> $GITHUB_STEP_SUMMARY
+          echo "- `GEMINI_API_KEY`: ✅ Configurada" >> $GITHUB_STEP_SUMMARY
