@@ -1,11 +1,11 @@
 # Sistema Automatizado de Generación de Efemérides
 
-Este sistema genera automáticamente efemérides históricas relacionadas con tecnología y programación usando IA, y las inserta en Supabase.
+Este sistema genera automáticamente efemérides históricas relacionadas con tecnología y programación usando Google Gemini AI, y las inserta en Supabase.
 
 ## 🏗️ Arquitectura del Sistema
 
 ### Componentes:
-1. **Edge Function de Supabase** - Genera efemérides usando OpenAI
+1. **Edge Function de Supabase** - Genera efemérides usando Google Gemini
 2. **Script de Cron** - Ejecuta la generación diariamente
 3. **API Route de Next.js** - Interfaz para generación manual
 4. **Hook de React** - Maneja la generación desde la UI
@@ -24,7 +24,7 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 # Para la generación automática
 SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
-OPENAI_API_KEY=your_openai_api_key_here
+GOOGLE_GEMINI_API_KEY=your_gemini_api_key_here
 
 # URL de la Edge Function (se genera automáticamente)
 SUPABASE_FUNCTION_URL=https://your-project-ref.supabase.co/functions/v1/generate-ephemeris
@@ -37,9 +37,9 @@ SUPABASE_FUNCTION_URL=https://your-project-ref.supabase.co/functions/v1/generate
 2. **Settings > API** - Copia la URL y anon key
 3. **Settings > API** - Copia la service role key (¡manténla segura!)
 
-#### OpenAI:
-1. Ve a [platform.openai.com](https://platform.openai.com)
-2. **API Keys** - Crea una nueva API key
+#### Google Gemini:
+1. Ve a [makersuite.google.com/app/apikey](https://makersuite.google.com/app/apikey)
+2. **Create API Key** - Crea una nueva API key
 3. Copia la key al archivo `.env.local`
 
 ## 🔧 Despliegue de la Edge Function
@@ -176,8 +176,8 @@ tail -f /var/log/ephemeris-generator.log
 
 ## 🚨 Solución de Problemas
 
-### Error: "Missing OpenAI API key"
-- Verifica que `OPENAI_API_KEY` esté en `.env.local`
+### Error: "Missing Google Gemini API key"
+- Verifica que `GOOGLE_GEMINI_API_KEY` esté en `.env.local`
 - Asegúrate de que la key sea válida
 
 ### Error: "Missing Supabase environment variables"
@@ -190,7 +190,7 @@ tail -f /var/log/ephemeris-generator.log
 
 ### La efeméride no se genera
 - Verifica los logs de la Edge Function
-- Comprueba que OpenAI esté respondiendo
+- Comprueba que Google Gemini esté respondiendo
 - Verifica que la tabla `ephemeris` tenga los permisos correctos
 
 ## 📊 Estructura de la Base de Datos
@@ -238,7 +238,7 @@ CREATE POLICY "Allow service role insert" ON ephemeris
 
 ### Para mayor frecuencia:
 - Modifica el cron para ejecutar cada hora
-- Implementa rate limiting en OpenAI
+- Implementa rate limiting en Google Gemini
 - Usa colas de trabajo para procesamiento asíncrono
 
 ## 🎯 Próximos Pasos
