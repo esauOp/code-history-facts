@@ -19,7 +19,7 @@ Crea un archivo `.env.local` en la raíz del proyecto:
 
 ```bash
 # Supabase Configuration
-NEXT_PUBLIC_SUPABASE_URL=https://jxwfbfjiudjbhbtadgfr.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 # Para la generación automática
@@ -27,7 +27,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key_here
 OPENAI_API_KEY=your_openai_api_key_here
 
 # URL de la Edge Function (se genera automáticamente)
-SUPABASE_FUNCTION_URL=https://jxwfbfjiudjbhbtadgfr.supabase.co/functions/v1/generate-ephemeris
+SUPABASE_FUNCTION_URL=https://your-project-ref.supabase.co/functions/v1/generate-ephemeris
 ```
 
 ### 2. Obtener Credenciales
@@ -54,7 +54,7 @@ npm install -g supabase
 supabase login
 
 # Link al proyecto
-supabase link --project-ref jxwfbfjiudjbhbtadgfr
+supabase link --project-ref your-project-ref
 
 # Desplegar la función
 supabase functions deploy generate-ephemeris

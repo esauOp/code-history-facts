@@ -32,7 +32,7 @@ Ve a tu repositorio → **Settings** → **Secrets and variables** → **Actions
 
 #### **NEXT_PUBLIC_SUPABASE_URL**
 ```
-https://jxwfbfjiudjbhbtadgfr.supabase.co
+https://your-project-ref.supabase.co
 ```
 
 #### **SUPABASE_SERVICE_KEY**

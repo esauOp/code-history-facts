@@ -31,7 +31,7 @@ Actualiza tu archivo `.env.local`:
 GEMINI_API_KEY=AIza...tu_gemini_key_aqui
 
 # Mantener las demás variables
-NEXT_PUBLIC_SUPABASE_URL=https://jxwfbfjiudjbhbtadgfr.supabase.co
+NEXT_PUBLIC_SUPABASE_URL=https://your-project-ref.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=tu_anon_key
 SUPABASE_SERVICE_ROLE_KEY=tu_service_role_key
 ```
@@ -93,7 +93,7 @@ node scripts/generate-daily-ephemeris.js 2025-01-15
 supabase functions deploy generate-ephemeris
 
 # Probar la función
-curl -X POST https://jbfjiudjbhbtadgfr.supabase.co/functions/v1/generate-ephemeris \
+curl -X POST https://your-project-ref.supabase.co/functions/v1/generate-ephemeris \
   -H "Authorization: Bearer tu_service_role_key"
 ```
 

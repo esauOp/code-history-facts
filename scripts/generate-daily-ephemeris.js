@@ -89,9 +89,9 @@ async function generateEphemeris(targetDate) {
     console.log(`🤖 Generando efeméride para ${day} de ${getMonthName(month)}...`)
 
     const prompt = `
-    Eres un experto en historia del mundo. Generas efemérides educativas sobre eventos históricos relacionados con hitos importantes en la la historia de la humanidad. Respondes siempre en formato JSON válido.
+    Eres un experto en historia de la programación y tecnología. Generas datos curiosos y educativos sobre eventos históricos relacionados con la historia de la programación, hitos importantes y tecnología en general. Respondes siempre en formato JSON válido.
 
-    Genera una efeméride importante para el ${day} de ${getMonthName(month)}.
+    Genera un dato curioso e importante para el ${day} de ${getMonthName(month)}.
 
 Busca un evento histórico relacionado que haya ocurrido un ${day} de ${getMonthName(month)} de cualquier año.
 
