@@ -43,6 +43,35 @@ export default function ProgrammingEphemeris() {
     clearMessages
   } = useEphemerisGenerator()
 
+  // Función para formatear fecha en español
+  const formatDateInSpanish = (date: Date): string => {
+    const options: Intl.DateTimeFormatOptions = {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric'
+    }
+    return date.toLocaleDateString('es-ES', options)
+  }
+
+  // Función para compartir en Twitter/X
+  const shareOnTwitter = () => {
+    if (!todayEphemeris) return
+    
+    const text = `📅 ${todayEphemeris.day} de ${getMonthName(todayEphemeris.month)} de ${todayEphemeris.historical_year}: ${todayEphemeris.event} #Efemérides #Historia`
+    const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
+    window.open(url, '_blank')
+  }
+
+  // Función auxiliar para obtener nombre del mes
+  const getMonthName = (month: number): string => {
+    const months = [
+      'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+      'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+    ]
+    return months[month - 1]
+  }
+
   useEffect(() => {
     const bootMessages = [
       "NOSTROMO MAINFRAME v2.1.7",
@@ -182,6 +211,54 @@ export default function ProgrammingEphemeris() {
               <div className="boot-text mb-1 text-muted-foreground">Connecting to historical archives...</div>
             )}
             {bootSequence >= 5 && <div className="boot-text mb-2 text-primary terminal-glow">System ready.</div>}
+          </div>
+        )}
+
+        {/* Sección de Fecha Actual y Efeméride del Día */}
+        {bootSequence >= 5 && todayEphemeris && (
+          <div className="mb-6 space-y-4 ephemeris-section">
+            {/* Fecha Actual */}
+            <div className="p-4 border border-accent/30 rounded-lg bg-background/50">
+              <div className="flex items-center space-x-2 text-sm">
+                <span className="text-white">📅</span>
+                <span className="text-white">Fecha actual:</span>
+                <span className="text-white font-medium ephemeris-date">{formatDateInSpanish(new Date())}</span>
+              </div>
+            </div>
+
+            {/* Efeméride del Día */}
+            <div className="p-4 border border-accent/30 rounded-lg bg-background/50">
+              <div className="flex flex-col space-y-3">
+                {/* Título */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-accent">&lt;&gt;</span>
+                  <span className="text-accent font-bold text-sm uppercase tracking-wide ephemeris-title">
+                    EFEMÉRIDE DEL DÍA
+                  </span>
+                </div>
+
+                {/* Fecha de la efeméride */}
+                <div className="text-accent text-sm ephemeris-date">
+                  {todayEphemeris.day} de {getMonthName(todayEphemeris.month)} de {todayEphemeris.historical_year}:
+                </div>
+
+                {/* Contenido de la efeméride */}
+                <div className="text-accent text-sm leading-relaxed">
+                  {todayEphemeris.event}
+                </div>
+
+                {/* Botón de compartir */}
+                <div className="flex justify-end pt-2">
+                  <button
+                    onClick={shareOnTwitter}
+                    className="px-4 py-2 bg-green-800/20 border border-accent/30 rounded-md text-white text-xs hover:bg-green-800/30 transition-colors flex items-center space-x-2 share-button"
+                  >
+                    <span className="text-white">𝕏</span>
+                    <span>Compartir</span>
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 

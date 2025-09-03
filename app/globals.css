@@ -204,3 +204,26 @@
   font-family: inherit;
   caret-color: #00ff00;
 }
+
+/* Estilos para la sección de efemérides */
+.ephemeris-section {
+  animation: boot-sequence 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.ephemeris-date {
+  text-shadow: 0 0 3px currentColor;
+}
+
+.ephemeris-title {
+  text-shadow: 0 0 5px currentColor, 0 0 8px currentColor;
+}
+
+.share-button {
+  transition: all 0.2s ease-in-out;
+}
+
+.share-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+}

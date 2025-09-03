@@ -21,6 +21,9 @@ export function useEphemeris() {
 				throw fetchError
 			}
 
+			console.log();
+			
+
 			setEphemerides(data || [])
 		} catch (err) {
 			console.error('Error fetching ephemerides:', err)

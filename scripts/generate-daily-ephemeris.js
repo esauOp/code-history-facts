@@ -13,16 +13,17 @@
 
 const https = require('https')
 const http = require('http')
+const { GoogleGenerativeAI } = require('@google/generative-ai')
 
 // Configuración desde variables de entorno
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
-const SUPABASE_SERVICE_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_KEY 
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY
 
-if (!OPENAI_API_KEY) {
-    console.error('❌ Error: OPENAI_API_KEY no está configurada')
-    console.error('Configura tu API key de OpenAI:')
-    console.error('export OPENAI_API_KEY="tu-api-key-aqui"')
+if (!GEMINI_API_KEY) {
+    console.error('❌ Error: GEMINI_API_KEY no está configurada')
+    console.error('Configura tu API key de Google Gemini:')
+    console.error('export GEMINI_API_KEY="tu-api-key-aqui"')
     process.exit(1)
 }
 
@@ -80,16 +81,19 @@ function getMonthName(month) {
     return months[month - 1]
 }
 
-// Función para generar efeméride usando OpenAI
+// Función para generar efeméride usando Google Gemini
 async function generateEphemeris(targetDate) {
     const day = targetDate.getDate()
     const month = targetDate.getMonth() + 1
 
     console.log(`🤖 Generando efeméride para ${day} de ${getMonthName(month)}...`)
 
-    const prompt = `Genera una efeméride sobre programación y desarrollo de software para el ${day} de ${getMonthName(month)}.
+    const prompt = `
+    Eres un experto en historia del mundo. Generas efemérides educativas sobre eventos históricos relacionados con hitos importantes en la la historia de la humanidad. Respondes siempre en formato JSON válido.
 
-Busca un evento histórico relacionado con programación, software, lenguajes, frameworks o tecnología que haya ocurrido un ${day} de ${getMonthName(month)} de cualquier año.
+    Genera una efeméride importante para el ${day} de ${getMonthName(month)}.
+
+Busca un evento histórico relacionado que haya ocurrido un ${day} de ${getMonthName(month)} de cualquier año.
 
 Responde SOLO en formato JSON:
 {
@@ -108,37 +112,16 @@ Ejemplo:
 }`
 
     try {
-        const response = await makeRequest('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${OPENAI_API_KEY}`,
-                'Content-Type': 'application/json',
-            }
-        }, {
-            model: 'gpt-5',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'Eres un experto en historia de la programación y tecnología. Generas efemérides educativas sobre eventos históricos relacionados con desarrollo de software, lenguajes de programación, frameworks, empresas tecnológicas y hitos importantes en la informática o el desarrollo de software. Respondes siempre en formato JSON válido.'
-                },
-                {
-                    role: 'user',
-                    content: prompt
-                }
-            ],
-            verbosity: 'medium',
-            reasoning_effort: 'minimal',
-            max_completion_tokens: 600,
-        });
+        // Inicializar Gemini
+        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
+        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
-        if (response.status !== 200) {
-            throw new Error(`Error de OpenAI: ${response.status} ${JSON.stringify(response.data)}`)
-        }
-
-        const content = response.data.choices[0]?.message?.content
+        // Generar contenido con Gemini
+        const result = await model.generateContent(prompt)
+        const content = result.response.text()
 
         if (!content) {
-            throw new Error('No se recibió contenido de OpenAI')
+            throw new Error('No se recibió contenido de Gemini')
         }
 
         // Limpiar la respuesta y extraer JSON si está en un bloque de código
@@ -154,6 +137,8 @@ Ejemplo:
                 cleanContent = lines.slice(startIndex + 1, endIndex).join('\n').trim()
             }
         }
+
+        console.log('Contenido generado:', cleanContent);
 
         // Parsear la respuesta JSON
         const ephemeris = JSON.parse(cleanContent)
@@ -221,7 +206,7 @@ async function insertEphemeris(targetDate, ephemerisData) {
     console.log(`💾 Insertando efeméride en la base de datos...`)
 
     try {
-        const response = await makeRequest(`${SUPABASE_URL}/rest/v1/ephemerides`, {
+        const response = await makeRequest(`${SUPABASE_URL}/rest/v1/ephemeris`, {
             method: 'POST',
             headers: {
                 'apikey': SUPABASE_SERVICE_KEY,

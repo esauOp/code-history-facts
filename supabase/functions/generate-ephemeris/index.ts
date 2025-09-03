@@ -1,6 +1,6 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { Configuration, OpenAIApi } from 'https://esm.sh/openai@3.3.0'
+import { GoogleGenerativeAI } from 'https://esm.sh/@google/generative-ai@0.24.1'
 
 const corsHeaders = {
 	'Access-Control-Allow-Origin': '*',
@@ -54,16 +54,14 @@ serve(async (req) => {
 			)
 		}
 
-		// Generar efeméride usando OpenAI
-		const openaiApiKey = Deno.env.get('OPENAI_API_KEY')
-		if (!openaiApiKey) {
-			throw new Error('Missing OpenAI API key')
+		// Generar efeméride usando Google Gemini
+		const geminiApiKey = Deno.env.get('GEMINI_API_KEY')
+		if (!geminiApiKey) {
+			throw new Error('Missing Gemini API key')
 		}
 
-		const configuration = new Configuration({
-			apiKey: openaiApiKey,
-		})
-		const openai = new OpenAIApi(configuration)
+		const genAI = new GoogleGenerativeAI(geminiApiKey)
+		const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 		
 		const prompt = `Genera una efeméride histórica relevante para el ${day} de ${getMonthName(month)} de ${year}. 
 
@@ -73,7 +71,7 @@ La efeméride debe ser:
 - Interesante y significativa
 - Con fecha exacta (día, mes, año)
 
-Responde en formato JSON con esta estructura:
+Responde SOLO en formato JSON con esta estructura:
 {
   "event": "Título del evento",
   "description": "Descripción detallada del evento histórico",
@@ -83,25 +81,11 @@ Responde en formato JSON con esta estructura:
   "significance": "Por qué es importante este evento"
 }`
 
-		const completion = await openai.createChatCompletion({
-			model: 'gpt-3.5-turbo',
-			messages: [
-				{
-					role: 'system',
-					content: 'Eres un historiador experto en tecnología y programación. Genera efemérides históricas precisas y verificables.'
-				},
-				{
-					role: 'user',
-					content: prompt
-				}
-			],
-			max_tokens: 500,
-			temperature: 0.7
-		})
-
-		const aiResponse = completion.data.choices[0]?.message?.content
+		const result = await model.generateContent(prompt)
+		const aiResponse = result.response.text()
+		
 		if (!aiResponse) {
-			throw new Error('No response from OpenAI')
+			throw new Error('No response from Gemini')
 		}
 
 		// Parsear la respuesta de la IA

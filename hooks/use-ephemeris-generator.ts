@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { generateEphemerisContent } from '@/lib/gemini'
 
 export function useEphemerisGenerator() {
 	const [generating, setGenerating] = useState(false)
@@ -32,29 +33,43 @@ export function useEphemerisGenerator() {
 				return
 			}
 
-			// Llamar a la Edge Function para generar la efeméride
-			const response = await fetch('/api/generate-ephemeris', {
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					targetDate: targetDate.toISOString(),
-					day,
-					month,
-					year
-				}),
-			})
+					// Generar efeméride usando Gemini
+		const aiResponse = await generateEphemerisContent(day, month, year)
+		
+		// Parsear la respuesta de la IA
+		let ephemerisData
+		try {
+			ephemerisData = JSON.parse(aiResponse)
+		} catch (e) {
+			throw new Error('Respuesta de IA en formato inválido')
+		}
 
-			if (!response.ok) {
-				const errorData = await response.json()
-				throw new Error(errorData.error || 'Error al generar la efeméride')
-			}
+		// Preparar datos para insertar
+		const newEphemeris = {
+			day,
+			month,
+			year,
+			event: ephemerisData.event,
+			display_date: `${day}/${month}/${year}`,
+			historical_day: ephemerisData.historical_day || day,
+			historical_month: ephemerisData.historical_month || month,
+			historical_year: ephemerisData.historical_year || year,
+			description: ephemerisData.description || ephemerisData.significance
+		}
 
-			const result = await response.json()
-			setSuccess(`✅ Efeméride generada exitosamente para el ${day}/${month}/${year}`)
+		// Insertar en Supabase
+		const { data, error } = await supabase
+			.from('ephemeris')
+			.insert([newEphemeris])
+			.select()
+			.single()
 
-			return result
+		if (error) {
+			throw error
+		}
+
+		setSuccess(`✅ Efeméride generada exitosamente para el ${day}/${month}/${year}`)
+		return { ephemeris: data }
 
 		} catch (err) {
 			const errorMessage = err instanceof Error ? err.message : 'Error desconocido'
