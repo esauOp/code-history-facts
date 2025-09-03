@@ -221,9 +221,36 @@
 
 .share-button {
   transition: all 0.2s ease-in-out;
+  position: relative;
+  overflow: hidden;
 }
 
 .share-button:hover {
   transform: translateY(-1px);
-  box-shadow: 0 0 8px rgba(255, 204, 0, 0.3);
+  box-shadow: 0 0 8px rgba(0, 255, 0, 0.2);
+}
+
+.share-button:active {
+  transform: translateY(0);
+}
+
+/* Estilos para el recuadro de efemérides */
+.ephemeris-section {
+  animation: boot-sequence 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+.ephemeris-date {
+  text-shadow: 0 0 3px currentColor;
+  font-weight: 600;
+}
+
+.ephemeris-title {
+  text-shadow: 0 0 5px currentColor, 0 0 8px currentColor;
+  font-weight: 500;
+}
+
+/* Efecto de borde brillante para el recuadro */
+.ephemeris-section .border {
+  box-shadow: 0 0 10px rgba(0, 255, 0, 0.1);
 }

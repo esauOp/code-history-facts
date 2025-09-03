@@ -20,20 +20,20 @@ export default function ProgrammingEphemeris() {
   const [userInput, setUserInput] = useState("")
   const [commandHistory, setCommandHistory] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
-  
+
   // Hook para detección del explorador
   const { isClient, closeTabShortcut } = useBrowserDetection()
-  
+
   // Hook para efemérides desde Supabase
-  const { 
-    ephemerides, 
-    loading: ephemeridesLoading, 
+  const {
+    ephemerides,
+    loading: ephemeridesLoading,
     error: ephemeridesError,
     getTodayEphemeris,
     getRandomEphemeris,
     fetchEphemerides
   } = useEphemeris()
-  
+
   // Hook para generación de efemérides
   const {
     generating,
@@ -57,7 +57,7 @@ export default function ProgrammingEphemeris() {
   // Función para compartir en Twitter/X
   const shareOnTwitter = () => {
     if (!todayEphemeris) return
-    
+
     const text = `📅 ${todayEphemeris.day} de ${getMonthName(todayEphemeris.month)} de ${todayEphemeris.historical_year}: ${todayEphemeris.event} #Efemérides #Historia`
     const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`
     window.open(url, '_blank')
@@ -79,6 +79,10 @@ export default function ProgrammingEphemeris() {
       "Loading ephemeris database...",
       "Connecting to historical archives...",
       "System ready.",
+      "",
+      "$ ./ephemeris_query --date=today",
+      "Querying database...",
+      "Found entry:",
       "",
     ]
 
@@ -210,6 +214,21 @@ export default function ProgrammingEphemeris() {
               <div className="boot-text mb-1 text-muted-foreground">Connecting to historical archives...</div>
             )}
             {bootSequence >= 5 && <div className="boot-text mb-2 text-primary terminal-glow">System ready.</div>}
+            {bootSequence >= 6 && (
+              <div className="boot-text mb-1">
+                <br />
+                $ ./ephemeris_query --date=today
+              </div>
+            )}
+            {bootSequence >= 7 && (
+              <div className="boot-text mb-1 text-muted-foreground">Querying database...</div>
+            )}
+            {bootSequence >= 8 && (
+              <div className="boot-text mb-1 text-muted-foreground">Querying database...</div>
+            )}
+            {bootSequence >= 9 && (
+              <div className="boot-text mb-1 text-muted-foreground">Found entry:</div>
+            )}
           </div>
         )}
 
@@ -233,11 +252,57 @@ export default function ProgrammingEphemeris() {
           </div>
         )}
 
-        
+        {/* Recuadro destacado para la efeméride del día */}
+        {(todayEphemeris && isExecuting) && (
+          <div className="mb-6 ephemeris-section">
+            <div className="border border-primary/30 bg-card/20 p-4 rounded-sm">
+              <div className="space-y-3">
+                {/* Fecha */}
+                <div className="flex items-start space-x-3">
+                  <span className="text-accent font-bold min-w-[60px]">DATE:</span>
+                  <div className="flex-1">
+                    <div className="text-primary ephemeris-dat">
+                      {todayEphemeris.day} de {getMonthName(todayEphemeris.month)} de {todayEphemeris.historical_year}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {formatDateInSpanish(new Date(todayEphemeris.year, todayEphemeris.month - 1, todayEphemeris.day))}
+                    </div>
+                  </div>
+                </div>
 
-        {isExecuting && (
-          <div className="mb-6">
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed">{programOutput}</pre>
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {(todayEphemeris && isExecuting) && (
+          <div className="mb-6 ephemeris-section">
+            <div className="border border-primary/30 bg-card/20 p-4 rounded-sm">
+              <div className="space-y-3">
+
+                {/* Evento */}
+                <div className="flex items-start space-x-3">
+                  <span className="text-accent font-bold min-w-[60px]">EVENT:</span>
+                  <div className="flex-1">
+                    <div className="text-foreground ephemeris-titl leading-relaxed">
+                      {todayEphemeris.event}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón de compartir */}
+              <div className="mt-4 pt-3 border-t border-primary/20">
+                <button
+                  onClick={shareOnTwitter}
+                  className="share-button border border-primary/30 bg-transparent text-primary px-3 py-1.5 rounded-sm text-xs font-medium hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
+                >
+                  <span className="inline-block mr-1.5">𝕏</span>
+                  Compartir
+                </button>
+              </div>
+            </div>
           </div>
         )}
 
@@ -281,13 +346,13 @@ export default function ProgrammingEphemeris() {
         <footer className="mt-8 pt-4 border-t border-muted/30 text-xs text-muted-foreground">
           <div className="flex flex-col items-center space-y-2">
             <div className="text-center">
-              Pulsa <kbd className="px-1 py-0.5 bg-muted rounded text-xs">{closeTabShortcut.description}</kbd> para salir
+              &gt; Pulsa <kbd className="px-1 py-0.5 bg-muted rounded text-xs">{closeTabShortcut.description}</kbd> para salir
             </div>
             <div className="text-center">
-              © 2025{" "}
-              <a 
-                href="https://esauortega.com" 
-                target="_blank" 
+              © 2025 History facts by {" "}
+              <a
+                href="https://esauortega.com"
+                target="_blank"
                 rel="noopener noreferrer"
                 className="text-primary hover:text-primary/80 underline transition-colors"
               >
