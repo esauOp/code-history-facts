@@ -99,7 +99,6 @@ export default function ProgrammingEphemeris() {
       setCurrentTime(
         now.toLocaleTimeString("es-ES", {
           hour12: false,
-          timeZone: "Europe/Madrid",
         }),
       )
     }, 1000)
@@ -214,53 +213,6 @@ export default function ProgrammingEphemeris() {
           </div>
         )}
 
-        {/* Sección de Fecha Actual y Efeméride del Día */}
-        {bootSequence >= 5 && todayEphemeris && (
-          <div className="mb-6 space-y-4 ephemeris-section">
-            {/* Fecha Actual */}
-            <div className="p-4 border border-accent/30 rounded-lg bg-background/50">
-              <div className="flex items-center space-x-2 text-sm">
-                <span className="text-white">📅</span>
-                <span className="text-white">Fecha actual:</span>
-                <span className="text-white font-medium ephemeris-date">{formatDateInSpanish(new Date())}</span>
-              </div>
-            </div>
-
-            {/* Efeméride del Día */}
-            <div className="p-4 border border-accent/30 rounded-lg bg-background/50">
-              <div className="flex flex-col space-y-3">
-                {/* Título */}
-                <div className="flex items-center space-x-2">
-                  <span className="text-accent">&lt;&gt;</span>
-                  <span className="text-accent font-bold text-sm uppercase tracking-wide ephemeris-title">
-                    EFEMÉRIDE DEL DÍA
-                  </span>
-                </div>
-
-                {/* Fecha de la efeméride */}
-                <div className="text-accent text-sm ephemeris-date">
-                  {todayEphemeris.day} de {getMonthName(todayEphemeris.month)} de {todayEphemeris.historical_year}:
-                </div>
-
-                {/* Contenido de la efeméride */}
-                <div className="text-accent text-sm leading-relaxed">
-                  {todayEphemeris.event}
-                </div>
-
-                {/* Botón de compartir */}
-                <div className="flex justify-end pt-2">
-                  <button
-                    onClick={shareOnTwitter}
-                    className="px-4 py-2 bg-green-800/20 border border-accent/30 rounded-md text-white text-xs hover:bg-green-800/30 transition-colors flex items-center space-x-2 share-button"
-                  >
-                    <span className="text-white">𝕏</span>
-                    <span>Compartir</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Indicador de carga de efemérides */}
         {ephemeridesLoading && (
@@ -281,46 +233,7 @@ export default function ProgrammingEphemeris() {
           </div>
         )}
 
-        {/* Controles de generación */}
-        {bootSequence >= 5 && (
-          <div className="mb-6 p-4 bg-muted/20 border border-muted/30 rounded-md">
-            <div className="flex flex-col space-y-3">
-              <div className="text-sm font-medium text-foreground">
-                🚀 Generación Automática de Efemérides
-              </div>
-              
-              <div className="flex flex-wrap gap-2">
-                <button
-                  onClick={generateTomorrowEphemeris}
-                  disabled={generating}
-                  className="px-3 py-2 bg-primary text-primary-foreground rounded-md text-xs hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {generating ? 'Generando...' : 'Generar para mañana'}
-                </button>
-                
-                <button
-                  onClick={clearMessages}
-                  className="px-3 py-2 bg-muted text-muted-foreground rounded-md text-xs hover:bg-muted/80"
-                >
-                  Limpiar mensajes
-                </button>
-              </div>
-
-              {/* Mensajes de estado */}
-              {generationError && (
-                <div className="text-sm text-destructive">
-                  ❌ {generationError}
-                </div>
-              )}
-              
-              {generationSuccess && (
-                <div className="text-sm text-green-600">
-                  {generationSuccess}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+        
 
         {isExecuting && (
           <div className="mb-6">
@@ -340,7 +253,7 @@ export default function ProgrammingEphemeris() {
 
         {bootSequence >= 5 && (
           <div className="flex items-center text-sm">
-            <span className="text-accent terminal-glow">nostromo@ephemeris:~$ </span>
+            <span className="text-accent terminal-glow">esauop@ephemeris:~$ </span>
             <input
               ref={inputRef}
               type="text"
