@@ -2,10 +2,10 @@
 
 /**
  * Script para generar efemérides diarias usando IA
- * 
+ *
  * Uso:
  * node scripts/generate-daily-ephemeris.js [fecha_opcional]
- * 
+ *
  * Ejemplos:
  * node scripts/generate-daily-ephemeris.js              // Genera para mañana
  * node scripts/generate-daily-ephemeris.js 2025-01-15   // Genera para fecha específica
@@ -13,7 +13,7 @@
 
 const https = require('https')
 const http = require('http')
-const { GoogleGenerativeAI } = require('@google/generative-ai')
+const { GoogleGenAI } = require('@google/genai')
 
 // Configuración desde variables de entorno
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL
@@ -113,12 +113,18 @@ Ejemplo:
 
     try {
         // Inicializar Gemini
-        const genAI = new GoogleGenerativeAI(GEMINI_API_KEY)
-        const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        // const genAI = new GoogleGenAI(GEMINI_API_KEY)
+        const ai = new GoogleGenAI({apiKey: GEMINI_API_KEY});
+        // const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
 
         // Generar contenido con Gemini
-        const result = await model.generateContent(prompt)
-        const content = result.response.text()
+        // const result = await model.generateContent(prompt)
+        const response = await ai.models.generateContent({
+            model: 'gemini-2.0-flash-001',
+            contents: prompt,
+          });
+
+        const content = response.text
 
         if (!content) {
             throw new Error('No se recibió contenido de Gemini')
@@ -286,4 +292,4 @@ async function main() {
 // Ejecutar el script
 if (require.main === module) {
     main()
-} 
+}
