@@ -17,24 +17,24 @@ jobs:
   generate-ephemeris:
     runs-on: ubuntu-latest
     environment: env
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
 
-      - name: Setup pnpm 
+      - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 8 # Or specify a different version, e.g., 'latest' or a specific version like '8.15.6'
-          
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
-        
+
       - name: Generate ephemeris for today
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
@@ -49,29 +49,29 @@ jobs:
             echo "Generando efeméride para la fecha actual"
             node scripts/generate-daily-ephemeris.js
           fi
-          
+
       - name: Commit and push if changes
         run: |
           # Configurar git
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          
+
           # Verificar si hay cambios
           if git diff --quiet; then
             echo "No hay cambios para commitear"
           else
             # Agregar todos los cambios
             git add .
-            
+
             # Crear commit con timestamp
             TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
             git commit -m "🤖 Auto-generate ephemeris - $TIMESTAMP"
-            
+
             # Hacer push
             git push
           fi
         continue-on-error: true
-        
+
       - name: Create summary
         run: |
           echo "## 📅 Generación de Efeméride Diaria" >> $GITHUB_STEP_SUMMARY
