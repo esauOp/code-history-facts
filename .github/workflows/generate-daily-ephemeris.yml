@@ -30,7 +30,7 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8 # Or specify a different version, e.g., 'latest' or a specific version like '8.15.6'
+          version: 9 # Or specify a different version, e.g., 'latest' or a specific version like '8.15.6'
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
