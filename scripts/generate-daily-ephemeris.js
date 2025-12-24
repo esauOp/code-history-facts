@@ -120,7 +120,7 @@ Ejemplo:
         // Generar contenido con Gemini
         // const result = await model.generateContent(prompt)
         const response = await ai.models.generateContent({
-            model: 'gemini-2.0-flash-001',
+            model: 'gemini-2.5-flash',
             contents: prompt,
           });
 
